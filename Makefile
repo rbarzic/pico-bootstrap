@@ -30,6 +30,7 @@ TARGET_ELF      ?=
         build-led build-led-freertos build-uart-hello \
         clean-led clean-led-freertos clean-uart-hello clean \
         upload \
+        scaffold \
         prereqs-deb prereqs-rhel \
         identify-board identify-probe identify-port \
         monitor \
@@ -42,6 +43,10 @@ TARGET_ELF      ?=
 help:
 	@echo ""
 	@echo "pico-bootstrap — Makefile targets"
+	@echo ""
+	@echo "  New project"
+	@echo "    scaffold PROJECT_NAME=<name>  Create a new project using pico-bootstrap as submodule"
+	@echo "             [PROJECT_DIR=<path>]  (default: ../<name>)"
 	@echo ""
 	@echo "  Prerequisites (require sudo)"
 	@echo "    prereqs-deb                 Install prerequisites (Debian/Ubuntu)"
@@ -86,6 +91,14 @@ help:
 	@echo "  Variables (override on command line)"
 	@echo "    INSTALL_DIR  (default: ./deps)"
 	@echo ""
+
+# ─── Scaffold ─────────────────────────────────────────────────────────────────
+scaffold:
+	@if [ -z "$(PROJECT_NAME)" ]; then \
+	    echo "ERROR: PROJECT_NAME is not set. Usage: make scaffold PROJECT_NAME=<name>"; \
+	    exit 1; \
+	fi
+	@bash tools/scaffold.sh "$(PROJECT_NAME)" "$(PROJECT_DIR)"
 
 # ─── Prerequisites ────────────────────────────────────────────────────────────
 prereqs-deb:

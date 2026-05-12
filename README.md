@@ -80,12 +80,19 @@ make upload TARGET_ELF=examples/led_toggle/build/led_toggle.elf PROBE_SERIAL=<se
 | `install-openocd` | Build and install openocd only |
 | `build-led` | Compile LED toggle (bare-metal) |
 | `build-led-freertos` | Compile LED toggle (FreeRTOS) |
+| `build-uart-hello` | Compile UART hello (Debug Probe serial, GP0/GP1) |
 | `clean-led` | Remove LED toggle build directory |
 | `clean-led-freertos` | Remove FreeRTOS LED build directory |
+| `clean-uart-hello` | Remove UART hello build directory |
 | `clean` | Remove all example build directories |
 | `upload TARGET_ELF=<path>` | Flash ELF via Debug Probe |
 | `identify-board` | List attached Pico/Pico2 by USB serial |
 | `identify-probe` | List attached Debug Probes by USB serial |
+| `identify-port` | Print `/dev/ttyACM*` for `PROBE_SERIAL` |
+| `monitor` | Open serial monitor for `PROBE_SERIAL` at 115200 baud |
+| `install-udev-rules` | Install OpenOCD udev rules (requires sudo) |
+| `prereqs-deb` | Install prerequisites on Debian/Ubuntu (requires sudo) |
+| `prereqs-rhel` | Install prerequisites on Fedora/RHEL/CentOS (requires sudo) |
 
 ---
 
@@ -97,27 +104,39 @@ make upload TARGET_ELF=examples/led_toggle/build/led_toggle.elf PROBE_SERIAL=<se
 | `TARGET_ELF` | _(required for upload)_ | Path to the `.elf` to flash |
 | `PROBE_SERIAL` | _(empty = first found)_ | USB serial of the Debug Probe to use |
 | `PICO_TARGET_CFG` | `rp2040.cfg` | OpenOCD target config; use `rp2350.cfg` for Pico2 |
+| `MONITOR_BAUD` | `115200` | Baud rate for the `monitor` target |
 
 ---
 
-## Submodule usage
+## Starting a new project
+
+Use the scaffold target to create a ready-to-build project with
+pico-bootstrap already wired in as a submodule:
 
 ```bash
-# In your project
-git submodule add https://github.com/rbarzic/pico-bootstrap.git pico-bootstrap
+make scaffold PROJECT_NAME=my-blinky
+cd ../my-blinky
+make download && make install
+make build
+make flash PROBE_SERIAL=<serial>
 ```
 
-```makefile
-# In your project's Makefile — share a common SDK installation
-INSTALL_DIR ?= $(HOME)/.pico-sdk
-include pico-bootstrap/Makefile
-```
+See [docs/new-project.md](docs/new-project.md) for the full guide,
+manual setup instructions, SDK sharing across projects, and Pico2 notes.
 
 ---
 
 ## Examples
 
-| Example | Path | Description |
-|---|---|---|
-| LED toggle | `examples/led_toggle/` | Bare-metal GPIO blink, 500 ms |
-| LED toggle (RTOS) | `examples/led_toggle_rtos/` | Same, via a FreeRTOS task |
+| Example | Build target | ELF path | Description |
+|---|---|---|---|
+| LED toggle | `build-led` | `examples/led_toggle/build/led_toggle.elf` | Bare-metal GPIO25 blink, 500 ms |
+| LED toggle (FreeRTOS) | `build-led-freertos` | `examples/led_toggle_rtos/build/led_toggle_rtos.elf` | Same blink via a FreeRTOS task |
+| UART hello | `build-uart-hello` | `examples/uart_hello/build/uart_hello.elf` | Prints a counter over UART0 (GP0/GP1) at 115200 baud, echoes received chars |
+
+Flash and monitor the UART example:
+```bash
+make build-uart-hello
+make upload TARGET_ELF=examples/uart_hello/build/uart_hello.elf PROBE_SERIAL=<serial>
+make monitor PROBE_SERIAL=<serial>   # auto-detects /dev/ttyACM*, Ctrl-A K to quit
+```
