@@ -1,0 +1,29 @@
+# Downloaded dependencies
+deps/
+
+# CMake build directories
+build/
+examples/led_toggle/build/
+examples/led_toggle_rtos/build/
+
+# CMake cache and generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+
+# Build artifacts
+*.elf
+*.bin
+*.hex
+*.uf2
+*.map
+*.dis
+
+# Stamp files
+.stamps/
+
+# Editor
+.vscode/
+*.swp
+*~
